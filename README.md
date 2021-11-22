@@ -26,6 +26,8 @@
 [ &UpArrow; Back to top](#table-of-content)
 
 ![Hero section image](demo/hero.png)
+
+
 ![Full page image](demo/full.png)
 
 -----------------
