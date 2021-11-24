@@ -10,7 +10,7 @@
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  box-sizing: content-box;
   scroll-behavior: smooth;
 }
 
@@ -83,13 +83,13 @@ section {
   transition: 0.5s;
 }
 
-#navbar__list li:hover {
+/* #navbar__list li:hover {
   background-color: var(--highlight);
 }
 
 #navbar__list li:hover a {
   color: white;
-}
+} */
 
 #navbar__list li a {
   text-decoration: none;

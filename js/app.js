@@ -14,6 +14,18 @@ function getCurrentWindowPosition() {
   return window.scrollY;
 }
 
+function getComputedStyleProp(element, prop) {
+  let result = getComputedStyle(element)[prop];
+
+  /**
+   * - remove px from value
+   * - convert value to number
+   */
+  result = Number(result.replace("px", ""));
+
+  return result;
+}
+
 /**
  * get numerical value of the given
  * HTMLElement margin top property
@@ -59,7 +71,12 @@ function getSectionStartPosition(section = null) {
    * to insure that scroll Y position in view port of window
    *
    */
-  return section.offsetTop - pageHeader.clientHeight - margin;
+  return (
+    section.offsetTop -
+    pageHeader.clientHeight -
+    margin -
+    getComputedStyleProp(section, "paddingTop")
+  );
 }
 
 /**
@@ -78,14 +95,13 @@ function getCurrentActiveSection() {
   // and calculate every section start and end scroll Y value
   sections.forEach(function (section) {
     let sectionStart = getSectionStartPosition(section);
-    let sectionEnd =
-      sectionStart + section.clientHeight + getSectionMarginTop();
-
+   /*  let sectionEnd =
+      sectionStart + section.clientHeight + getSectionMarginTop(); */
     /**
      * if window scroll Y position is between section start
      * and section end this section will be marked as active section
      */
-    if (scrollY >= sectionStart && scrollY <= sectionEnd) {
+    if (scrollY >= sectionStart /* || scrollY <= sectionEnd */) {
       activeSection = section;
     }
   });
@@ -133,6 +149,7 @@ function detectActiveSectionOnStart() {
 
     // activate window
     toggleActiveSection(section);
+    activateMenuLink(section);
   }
 }
 
@@ -211,17 +228,38 @@ function buildNavigationMenu() {
     navbarListItems.appendChild(navMenuItem);
 
     // add event listener to element click
-    navMenuLink.addEventListener("click", function (e) {
+    /* navMenuLink.addEventListener("click", function (e) {
       e.preventDefault();
       toggleActiveSection(section);
       window.scrollTo({
         top: sectionStart,
       });
-    });
+    }); */
+    navMenuLink.addEventListener("click", scrollToSection);
   });
 
   // append all fragment to navbarList
   navbarList.appendChild(navbarListItems);
+}
+
+/**
+ * scroll to section when 
+ * nav menu clicked
+ * 
+ * 
+ * @param {Event} e 
+ */
+function scrollToSection(e) {
+  e.preventDefault();
+  let section = document.querySelector(e.target.getAttribute("href"));
+  let sectionStart = getSectionStartPosition(section);
+  toggleActiveSection(section);
+  activateMenuLink(section);
+  setTimeout(() => {
+    window.scrollTo({
+      top: sectionStart + getComputedStyleProp(section, "marginTop") + getComputedStyleProp(section, 'paddingTop'),
+    });
+  }, 0);
 }
 
 /**
@@ -243,4 +281,12 @@ window.addEventListener("scroll", function () {
     toggleActiveSection(section);
     activateMenuLink(section);
   }
+});
+
+/**
+ * when window size changed
+ * 
+ */
+window.addEventListener("resize", function (e) {
+  detectActiveSectionOnStart();
 });
